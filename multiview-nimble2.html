@@ -2,7 +2,7 @@
   <head>
     <meta charset="utf-8"/>
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-    <script src="https://softvelum.com/player/releases/sldp-v2.17.5.min.js"></script>
+    <script src="https://softvelum.com/player/releases/sldp-v2.25.0.min.js"></script>
 
     <style>
       body {
@@ -232,12 +232,13 @@
           playerContainerElement.removeChild(playerWrapperElement);
 
           // Atualizar os índices dos players restantes
-          for (var i = playerIndex; i <= playerWrapperElements.length; i++) {
-              var playerWrapper = playerWrapperElements[i - 1];
-              playerWrapper.getElementsByTagName('div')[0].setAttribute('id', 'linkText-' + i);
-              playerWrapper.getElementsByClassName('player-wrp')[0].setAttribute('id', 'player-wrp-' + i);
-              playerWrapper.getElementsByClassName('vu-meter-wrp')[0].setAttribute('id', 'vu-meter-' + i);
-              playerWrapper.getElementsByClassName('close-button')[0].setAttribute('onclick', 'removePlayer(' + i + ')');
+          for (var i = 0; i <= playerWrapperElements.length; i++) {
+              var playerWrapper = playerWrapperElements[i];
+              var newIndex = i + 1;
+              playerWrapper.getElementsByTagName('div')[0].setAttribute('id', 'linkText-' + newIndex);
+              playerWrapper.getElementsByClassName('player-wrp')[0].setAttribute('id', 'player-wrp-' + newIndex);
+              playerWrapper.getElementsByClassName('vu-meter-wrp')[0].setAttribute('id', 'vu-meter-' + newIndex);
+              playerWrapper.getElementsByClassName('close-button')[0].setAttribute('onclick', 'removePlayer(' + newIndex + ')');
           }
       }
     </script>
