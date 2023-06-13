@@ -1,0 +1,208 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script src="https://softvelum.com/player/releases/sldp-v2.17.5.min.js"></script>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        #buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            width: 100%;
+            height: 40px;
+        }
+
+        .url-content {
+            width: 400px;
+        }
+
+        #player-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 20px;
+            margin-top: 15px;
+        }
+
+        .link-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 5px;
+            background-color: transparent;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .player-name {
+            position: absolute;
+            font-family: Georgia, serif;
+            font-size: 15px;
+            text-align: center;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2px;
+            background-color: transparent;
+            color: #808080;
+            font-weight: bold;
+            text-shadow: -1px -1px 0 #FFF, 1px 1px 0 #000;
+            z-index: 1;
+        }
+
+        .player-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 200px;
+            box-sizing: border-box;
+        }
+
+        .vu-meter-wrp {
+            width: 60px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+        }
+
+        .vu-meter-bar {
+            width: 100%;
+            background-color: #ddd;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .player-wrapper:hover .close-button {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Container dos botões e campo de entrada -->
+    <div id="buttons-container">
+        <input class="url-content" type="text" id="link" placeholder="Paste link here">
+        <button onclick="startPlayers()">Start Players</button>
+    </div>
+
+    <!-- Container dos players -->
+    <div id="player-container"></div>
+
+    <script type="text/javascript">
+        // Variável para armazenar os players
+        var sldpPlayers = [];
+
+        // Função para iniciar os players
+        function startPlayers() {
+            // Obter o link da entrada
+            var linkInput = document.getElementById('link');
+            var link = linkInput.value.trim();
+            var linkParts = link.split('/');
+            var linkText = linkParts.slice(-2).join('/');
+
+            // Criar elemento de texto do link
+            var linkElement = document.createElement('p');
+            linkElement.classList.add('link-text');
+            linkElement.textContent = linkText;
+
+            if (link) {
+                if (sldpPlayers.length === 16) {
+                    alert('Maximum number of players reached!');
+                    return;
+                }
+
+                // Criar container do player
+                var playerContainer = document.createElement('div');
+                playerContainer.appendChild(linkElement);
+                playerContainer.classList.add('player-wrapper');
+                playerContainer.innerHTML = `
+                    <div class="player-container">
+                        <div id="linkText-${sldpPlayers.length + 1}" class="player-name">${linkText}</div>
+                        <div class="vu-meter-wrp" id="vu-meter-${sldpPlayers.length + 1}">
+                            <div class="player-wrp" id="player-wrp-${sldpPlayers.length + 1}"></div>
+                            <div class="close-button" onclick="removePlayer(${sldpPlayers.length + 1})">X</div>
+                        </div>
+                    </div>
+                `;
+
+                // Adicionar container do player ao elemento de container dos players
+                var playerContainerElement = document.getElementById('player-container');
+                playerContainerElement.appendChild(playerContainer);
+
+                // Inicializar o player SLDP
+                var player = SLDP.init({
+                    container: 'player-wrp-' + (sldpPlayers.length + 1),
+                    stream_url: link,
+                    buffering: 800,
+                    autoplay: true,
+                    muted: true,
+                    height: 200,
+                    vu_meter: { type: 'input', mode: 'peak', container: 'vu-meter-' + (sldpPlayers.length + 1), rate: 10 },
+                });
+
+                // Adicionar o player à lista de players
+                sldpPlayers.push(player);
+
+                // Limpar o campo de texto
+                linkInput.value = '';
+            } else {
+                alert('Please enter a link!');
+                return;
+            }
+        }
+
+        // Função para remover um player
+        function removePlayer(playerIndex) {
+            if (playerIndex < 1 || playerIndex > sldpPlayers.length) {
+                alert('Invalid player index!');
+                return;
+            }
+
+            // Remover o player da lista de players e destruí-lo
+            var removedPlayer = sldpPlayers[playerIndex - 1];
+            removedPlayer.destroy();
+            sldpPlayers.splice(playerIndex - 1, 1);
+
+            // Remover o container do player do elemento de container dos players
+            var playerContainerElement = document.getElementById('player-container');
+            var playerWrapperElements = playerContainerElement.getElementsByClassName('player-wrapper');
+            var playerWrapperElement = playerWrapperElements[playerIndex - 1];
+            playerContainerElement.removeChild(playerWrapperElement);
+
+            // Atualizar os índices dos players restantes
+            for (var i = playerIndex; i <= playerWrapperElements.length; i++) {
+                var playerWrapper = playerWrapperElements[i - 1];
+                playerWrapper.getElementsByTagName('div')[0].setAttribute('id', 'linkText-' + i);
+                playerWrapper.getElementsByClassName('player-wrp')[0].setAttribute('id', 'player-wrp-' + i);
+                playerWrapper.getElementsByClassName('vu-meter-wrp')[0].setAttribute('id', 'vu-meter-' + i);
+                playerWrapper.getElementsByClassName('close-button')[0].setAttribute('onclick', 'removePlayer(' + i + ')');
+            }
+        }
+    </script>
+</body>
+</html>
