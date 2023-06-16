@@ -180,6 +180,16 @@
             }
         }
 
+        // Adicionar event listener para a tecla Enter
+        var linkInput = document.getElementById('link');
+        linkInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                startPlayers();
+            }
+        });
+
+
         // Função para remover um player
         function removePlayer(playerIndex) {
             if (playerIndex < 1 || playerIndex > sldpPlayers.length) {
