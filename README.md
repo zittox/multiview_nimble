@@ -3,5 +3,8 @@
 
 
 
-### todo:
-- error: invalid player index - quando se fecha players
+ grid 4x4, campo pra adicionar player e botão pra fechar individualmente cada player.
+ 
+
+
+[print](img.png) 
