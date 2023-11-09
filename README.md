@@ -3,7 +3,7 @@
 
 
 
- ### grid 4x4, campo pra adicionar player e botão pra fechar individualmente cada player.
+ ### grid dinâmico, campo pra adicionar player e botão pra fechar individualmente cada player. PIP funciona (testado em chrome)
  
 
 
